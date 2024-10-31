@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface FlightRepository extends JpaRepository<Flight, Long> {
     // Método para buscar vuelos por origen, destino y tiempo de salida
-    List<Flight> findByOriginAndDestinationAndDepartureTimeAfter(String origin, String destination, LocalDateTime departureTime);
+    List<Flight> findByOriginAndDestinationAndDepartureTimeBetween(String origin, String destination, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

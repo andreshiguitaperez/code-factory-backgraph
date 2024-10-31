@@ -6,11 +6,15 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+
+@CrossOrigin(origins = "*")
 
 @Controller
 public class FlightController {
@@ -49,12 +53,15 @@ public class FlightController {
     @QueryMapping
     public List<Flight> searchFlights(@Argument String origin, @Argument String destination, @Argument String departureDate) {
         try {
-            LocalDateTime departureDateTime = LocalDateTime.parse(departureDate + "T00:00:00", DATE_FORMATTER);
-            return flightService.searchFlights(origin, destination, departureDateTime);
+            // Cambia el formato del departureDate para que sea LocalDate
+            LocalDate departureLocalDate = LocalDate.parse(departureDate); // Suponiendo que llega en formato "yyyy-MM-dd"
+            return flightService.searchFlights(origin, destination, departureLocalDate); // Cambia aquí para usar LocalDate
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use the format: yyyy-MM-dd", e);
         }
     }
+
+
 
     @QueryMapping
     public Flight getFlightDetails(@Argument Long flightId) {

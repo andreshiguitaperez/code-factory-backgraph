@@ -4,6 +4,7 @@ import javax.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -36,6 +37,9 @@ public class Flight {
 
     @Column(nullable = false)
     private LocalDateTime arrivalTime;
+
+    @Column(nullable = false)
+    private LocalDate departureDate;
 
     @Column(nullable = false)
     private String airplaneType;

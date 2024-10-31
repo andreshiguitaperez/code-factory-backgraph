@@ -4,6 +4,7 @@ import com.udea.graphvirtual.entity.Flight;
 import com.udea.graphvirtual.repository.FlightRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +42,13 @@ public class FlightService {
         return flightRepository.save(flight);
     }
 
-    // Método de búsqueda con los nombres correctos
-    public List<Flight> searchFlights(String origin, String destination, LocalDateTime departureDateTime) {
-        return flightRepository.findByOriginAndDestinationAndDepartureTimeAfter(origin, destination, departureDateTime);
+    public List<Flight> searchFlights(String origin, String destination, LocalDate departureDate) {
+        // Modificar esta lógica según cómo quieras manejar la búsqueda con fecha
+        LocalDateTime startDateTime = departureDate.atStartOfDay(); // Comienza desde la medianoche de esa fecha
+        LocalDateTime endDateTime = departureDate.plusDays(1).atStartOfDay(); // Hasta la medianoche del día siguiente
+
+        return flightRepository.findByOriginAndDestinationAndDepartureTimeBetween(origin, destination, startDateTime, endDateTime);
     }
+
 
 }
