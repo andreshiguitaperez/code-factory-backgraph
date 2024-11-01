@@ -51,15 +51,21 @@ public class FlightController {
     }
 
     @QueryMapping
-    public List<Flight> searchFlights(@Argument String origin, @Argument String destination, @Argument String departureDate) {
+    public List<Flight> searchFlights(@Argument String origin, @Argument String destination,
+                                      @Argument String departureDate,
+                                      @Argument Float minPrice, @Argument Float maxPrice) {
         try {
             // Cambia el formato del departureDate para que sea LocalDate
             LocalDate departureLocalDate = LocalDate.parse(departureDate); // Suponiendo que llega en formato "yyyy-MM-dd"
-            return flightService.searchFlights(origin, destination, departureLocalDate); // Cambia aquí para usar LocalDate
+
+            // Llama al servicio con los parámetros de precio
+            return flightService.searchFlights(origin, destination, departureLocalDate, minPrice, maxPrice);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use the format: yyyy-MM-dd", e);
         }
     }
+
+
 
 
 

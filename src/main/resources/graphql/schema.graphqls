@@ -23,7 +23,7 @@ type Reservation{
 type Query{
     allFlights: [Flight]
     flightById(id: ID!): Flight
-    searchFlights(origin: String!, destination: String!, departureDate: String!): [Flight]
+    searchFlights(origin: String!, destination: String!, departureDate: String!, minPrice: Float, maxPrice: Float): [Flight]
     getFlightDetails(flightId: ID!): Flight
 }
 
