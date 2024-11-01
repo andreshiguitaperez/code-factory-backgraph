@@ -18,7 +18,7 @@ public class FlightService {
         this.flightRepository = flightRepository;
     }
 
-    public List<Flight> getAllFlights(){
+    public List<Flight> getAllFlights() {
         return flightRepository.findAll();
     }
 
@@ -26,10 +26,8 @@ public class FlightService {
         return flightRepository.findById(id); // Esto devuelve Optional<Flight>
     }
 
-
-
     public Flight addFlight(String flightNumber, int seatsAvailable, String origin,
-                            String destination, LocalDateTime departureTime, LocalDateTime arrivalTime){
+                            String destination, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         Flight flight = Flight.builder()
                 .flightNumber(flightNumber)
                 .seatsAvailable(seatsAvailable)
@@ -42,13 +40,19 @@ public class FlightService {
         return flightRepository.save(flight);
     }
 
-    public List<Flight> searchFlights(String origin, String destination, LocalDate departureDate) {
-        // Modificar esta lógica según cómo quieras manejar la búsqueda con fecha
+    // Actualizar el método searchFlights para incluir el filtrado por precio
+    public List<Flight> searchFlights(String origin, String destination, LocalDate departureDate,
+                                      Float minPrice, Float maxPrice) {
         LocalDateTime startDateTime = departureDate.atStartOfDay(); // Comienza desde la medianoche de esa fecha
         LocalDateTime endDateTime = departureDate.plusDays(1).atStartOfDay(); // Hasta la medianoche del día siguiente
 
-        return flightRepository.findByOriginAndDestinationAndDepartureTimeBetween(origin, destination, startDateTime, endDateTime);
+        // Lógica de búsqueda
+        if (minPrice != null && maxPrice != null) {
+            return flightRepository.findByOriginAndDestinationAndDepartureTimeBetweenAndPriceBetween(
+                    origin, destination, startDateTime, endDateTime, minPrice, maxPrice);
+        } else {
+            return flightRepository.findByOriginAndDestinationAndDepartureTimeBetween(
+                    origin, destination, startDateTime, endDateTime);
+        }
     }
-
-
 }
