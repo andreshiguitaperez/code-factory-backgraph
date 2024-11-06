@@ -1,4 +1,4 @@
-name: nombre_contenedor
+name: busqueda_vuelos_virtual
 services:
   springboot-app:
     build:
