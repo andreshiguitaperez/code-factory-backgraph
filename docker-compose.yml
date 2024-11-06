@@ -1,0 +1,13 @@
+name: nombre_contenedor
+services:
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - "8025:8025" #puerto correspondiente
+    networks:
+    - my_bridge_network
+networks:
+  my_bridge_network:
+    external: true
