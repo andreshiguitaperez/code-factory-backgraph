@@ -1,52 +1,64 @@
 package com.udea.graphvirtual.entity;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
+@Data
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Table(name = "flight")
 public class Flight {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "flight_number")
     private String flightNumber;
 
-    @Column(nullable = false)
+    @JoinColumn(name = "origin")
+    @ManyToOne
+    private Airport origin;
+
+    @JoinColumn(name = "destination")
+    @ManyToOne
+    private Airport destination;
+
+    @Column(name = "seats_available")
     private int seatsAvailable;
 
-    @Column(nullable = false)
-    private String origin;
+    @Column(name = "departure_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
+    private Date departureDate;
 
-    @Column(nullable = false)
-    private String destination;
+    @Column(name = "departure_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @Temporal(TemporalType.TIME)
+    private Calendar departureTime;
 
-    @Column(nullable = false)
-    private LocalDateTime departureTime;
+    @Column(name = "arrival_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
+    private Date arrivalDate;
 
-    @Column(nullable = false)
-    private LocalDateTime arrivalTime;
+    @Column(name = "arrival_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @Temporal(TemporalType.TIME)
+    private Calendar arrivalTime;
 
-    @Column(nullable = false)
-    private LocalDate departureDate;
+    @Column(name = "price")
+    private Double price;
 
-    @Column(nullable = false)
-    private String airplaneType;
-
-    @Column(nullable = false)
-    private BigDecimal price;
-
-    @Column(nullable = false)
-    private Boolean isDirect;
+    @Column(name = "distance")
+    private Double distance;
 }

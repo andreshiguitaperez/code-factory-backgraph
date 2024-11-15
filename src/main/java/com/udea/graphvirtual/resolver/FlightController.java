@@ -1,5 +1,6 @@
 package com.udea.graphvirtual.resolver;
 
+import com.udea.graphvirtual.entity.Airport;
 import com.udea.graphvirtual.entity.Flight;
 import com.udea.graphvirtual.service.FlightService;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -8,11 +9,16 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 
@@ -32,25 +38,28 @@ public class FlightController {
     }
 
     @QueryMapping
-    public Flight flightById(@Argument Long id) {
+    public Flight flightById(@Argument UUID id) {
         return flightService.getFlightById(id)
                 .orElseThrow(() -> new RuntimeException("Flight not found with ID: " + id));
     }
 
 
     @MutationMapping
-    public Flight addFlight(@Argument String flightNumber, @Argument int seatsAvailable, @Argument String origin, @Argument String destination,
-                            @Argument String departureTime, @Argument String arrivalTime) {
+    public Flight addFlight(@Argument UUID id, @Argument String flightNumber, @Argument int seatsAvailable, @Argument String origin, @Argument String destination,
+                            @Argument String departureTime, @Argument String arrivalTime, @Argument Double price, @Argument Double distance, @Argument String departureDate, @Argument String arrivalDate ) {
         try {
-            LocalDateTime departure = LocalDateTime.parse(departureTime, DATE_FORMATTER);
-            LocalDateTime arrival = LocalDateTime.parse(arrivalTime, DATE_FORMATTER);
-            return flightService.addFlight(flightNumber, seatsAvailable, origin, destination, departure, arrival);
-        } catch (DateTimeParseException e) {
+            Calendar departure = Calendar.getInstance();
+            departure.setTime(new SimpleDateFormat("HH:mm:ss").parse(departureTime));
+            Calendar arrival = Calendar.getInstance();
+            arrival.setTime(new SimpleDateFormat("HH:mm:ss").parse(arrivalTime));
+
+            return flightService.addFlight(flightNumber, seatsAvailable, origin, price, distance, destination, departure, arrival, new SimpleDateFormat("yyyy-MM-dd").parse(departureDate), new SimpleDateFormat("yyyy-MM-dd").parse(arrivalDate));
+        } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use the format: yyyy-MM-dd'T'HH:mm:ss", e);
         }
     }
 
-    @QueryMapping
+    /*@QueryMapping
     public List<Flight> searchFlights(@Argument String origin, @Argument String destination,
                                       @Argument String departureDate,
                                       @Argument Float minPrice, @Argument Float maxPrice) {
@@ -63,18 +72,63 @@ public class FlightController {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use the format: yyyy-MM-dd", e);
         }
-    }
-
-
-
-
+    } */
 
     @QueryMapping
-    public Flight getFlightDetails(@Argument Long flightId) {
-        return flightService.getFlightById(flightId) // Esto devuelve un Optional<Flight>
-                .orElseThrow(() -> new RuntimeException("Flight not found with ID: " + flightId));
+    public List<Flight> findFlightsByOriginDestinationDate(
+            @Argument String departureDate,
+            @Argument UUID origin,
+            @Argument UUID destination
+    ) throws ParseException {
+        Airport departureAirport = new Airport();
+        Airport arrivalAirport = new Airport();
+        departureAirport.setId(origin);
+        arrivalAirport.setId(destination);
+        return flightService.findByDepartureDateEqualsAndOriginEqualsAndDestinationEquals(
+                new SimpleDateFormat("yyyy-MM-dd").parse(departureDate),
+                departureAirport,
+                arrivalAirport);
     }
 
+    @QueryMapping
+    public List<Flight> findFlightsByOriginDestinationDateFilteredByDepartureTime(
+            @Argument String departureDate,
+            @Argument UUID origin,
+            @Argument UUID destination,
+            @Argument String departureTime,
+            @Argument String finalDepartureTime
+    ) throws ParseException {
+        Airport departureAirport = new Airport();
+        Airport arrivalAirport = new Airport();
+        departureAirport.setId(origin);
+        arrivalAirport.setId(destination);
+        return flightService.findByDepartureDateEqualsAndOriginEqualsAndDestinationEqualsAndDepartureTimeRange(
+                new SimpleDateFormat("yyyy-MM-dd").parse(departureDate),
+                departureAirport,
+                arrivalAirport,
+                departureTime,
+                finalDepartureTime);
+    }
+
+    @QueryMapping
+    public List<Flight> findFlightsByOriginDestinationDateFilteredByArrivalTime(
+            @Argument String departureDate,
+            @Argument UUID origin,
+            @Argument UUID destination,
+            @Argument String arrivalTime,
+            @Argument String finalArrivalTime
+    ) throws ParseException {
+        Airport departureAirport = new Airport();
+        Airport arrivalAirport = new Airport();
+        departureAirport.setId(origin);
+        arrivalAirport.setId(destination);
+        return flightService.findByDepartureDateEqualsAndOriginEqualsAndDestinationEqualsAndArrivalTimeRange(
+                new SimpleDateFormat("yyyy-MM-dd").parse(departureDate),
+                departureAirport,
+                arrivalAirport,
+                arrivalTime,
+                finalArrivalTime);
+    }
 
 
 }

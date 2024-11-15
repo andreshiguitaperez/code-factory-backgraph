@@ -1,33 +1,39 @@
-type Flight{
+type Flight {
     id: ID!
     flightNumber: String!
-    origin: String!
-    destination: String!
+    origin: Airport!
+    destination: Airport!
     seatsAvailable: Int!
+    departureDate: String!
     departureTime: String!
+    arrivalDate: String!
     arrivalTime: String!
-    airplaneType: String!
     price: Float!
-    isDirect: Boolean!
-    reservations: [Reservation!]!
+    distance: Float!
 }
 
-type Reservation{
+type Airport {
     id: ID!
-    passengerName: String!
-    seatNumber: String!
-    reservationCode: String!
-    flight: Flight!
+    airportCode: String!
+    airportName: String!
+    airportCity: String!
+    airportCountry: String!
+    latitude: Float!
+    longitude: Float!
+    origin: [Flight!]!
+    destination: [Flight!]!
 }
+
 
 type Query{
     allFlights: [Flight]
     flightById(id: ID!): Flight
-    searchFlights(origin: String!, destination: String!, departureDate: String!, minPrice: Float, maxPrice: Float): [Flight]
-    getFlightDetails(flightId: ID!): Flight
+    #searchFlights(origin: String!, destination: String!, departureDate: String!, minPrice: Float, maxPrice: Float): [Flight]
+    findFlightsByOriginDestinationDate(departureDate: String!, origin: ID!, destination: ID!): [Flight]
+    findFlightsByOriginDestinationDateFilteredByDepartureTime(departureDate: String!, origin: ID!, destination: ID!, departureTime: String!, finalDepartureTime: String): [Flight]
+    findFlightsByOriginDestinationDateFilteredByArrivalTime(departureDate: String!, origin: ID!, destination: ID!, arrivalTime: String!, finalArrivalTime: String): [Flight]
 }
 
 type Mutation{
-    reserveFlight(flightId: ID!, passengerName: String!, seatNumber: String!): Reservation
-    addFlight(flightNumber: String!, seatsAvailable: Int!, origin: String!, destination: String!,departureTime: String!, arrivalTime: String!): Flight
+    addFlight(id: ID!, flightNumber: String!, seatsAvailable: Int!, origin: String!, destination: String!,departureTime: String!, arrivalTime: String!, price: Float!, distance: Float!, departureDate: String!, arrivalDate: String!): Flight
 }

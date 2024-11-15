@@ -1,26 +1,48 @@
 package com.udea.graphvirtual.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import javax.persistence.*;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "airport")
 public class Airport {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String code;
+    @Column(name = "airport_code", unique = true)
+    private String airportCode;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "airport_name", unique = true)
+    private String airportName;
 
-    private String city;
-    private String country;
+    @Column(name = "airport_city")
+    private String airportCity;
+
+    @Column(name = "airport_country")
+    private String airportCountry;
+
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "origin")
+    private Set<Flight> origin;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "destination")
+    private Set<Flight> destination;
 }
