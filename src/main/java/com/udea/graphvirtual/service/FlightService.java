@@ -7,9 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 @Service
 public class FlightService {
@@ -29,19 +30,21 @@ public class FlightService {
     }
 
     public Flight addFlight(String flightNumber, int seatsAvailable, String origin, Double price, Double distance,
-                            String destination, Calendar departureTime, Calendar arrivalTime, Date departureDate, Date arrivalDate) {
+                            String destination, LocalTime departureTime, LocalTime arrivalTime, Date departureDate, Date arrivalDate) {
         Airport origen = new Airport();
         origen.setId(UUID.fromString(origin));
         Airport destino = new Airport();
         destino.setId(UUID.fromString(destination));
+
+        // Crear el objeto Flight con LocalTime para departureTime y arrivalTime
         Flight flight = Flight.builder()
-                //.id(UUID.randomUUID())
+                //.id(UUID.randomUUID()) // Si quieres generar un UUID automáticamente, descomenta esta línea
                 .flightNumber(flightNumber)
                 .seatsAvailable(seatsAvailable)
                 .origin(origen)
                 .destination(destino)
-                .departureTime(departureTime)
-                .arrivalTime(arrivalTime)
+                .departureTime(departureTime) // LocalTime para hora de salida
+                .arrivalTime(arrivalTime) // LocalTime para hora de llegada
                 .departureDate(departureDate)
                 .arrivalDate(arrivalDate)
                 .price(price)
@@ -71,7 +74,28 @@ public class FlightService {
             Date departureDate,
             Airport departureAirport,
             Airport arrivalAirport) {
-        return flightRepository.findByDepartureDateEqualsAndOriginEqualsAndDestinationEquals(departureDate, departureAirport, arrivalAirport);
+
+        // Obtener los vuelos desde el repositorio
+        List<Flight> flights = flightRepository.findByDepartureDateEqualsAndOriginEqualsAndDestinationEquals(
+                departureDate, departureAirport, arrivalAirport);
+
+        // Formatear las fechas de cada vuelo antes de devolverlas
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+        for (Flight flight : flights) {
+            // Convertir LocalTime a String para presentación
+            if (flight.getDepartureTime() != null) {
+                // Convertimos LocalTime a String
+                String departureTimeString = flight.getDepartureTime().format(timeFormat);
+                flight.setDepartureTimeString(departureTimeString);  // Asumiendo que tienes un campo String para almacenar la hora en formato de texto
+            }
+            if (flight.getArrivalTime() != null) {
+                // Convertimos LocalTime a String
+                String arrivalTimeString = flight.getArrivalTime().format(timeFormat);
+                flight.setArrivalTimeString(arrivalTimeString);  // Lo mismo aquí
+            }
+        }
+
+        return flights;
     }
 
     public List<Flight> findByDepartureDateEqualsAndOriginEqualsAndDestinationEqualsAndDepartureTimeRange(

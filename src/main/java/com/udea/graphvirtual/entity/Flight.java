@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Calendar;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -43,8 +43,7 @@ public class Flight {
 
     @Column(name = "departure_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @Temporal(TemporalType.TIME)
-    private Calendar departureTime;
+    private LocalTime departureTime;
 
     @Column(name = "arrival_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -53,12 +52,17 @@ public class Flight {
 
     @Column(name = "arrival_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @Temporal(TemporalType.TIME)
-    private Calendar arrivalTime;
+    private LocalTime arrivalTime;
 
     @Column(name = "price")
     private Double price;
 
     @Column(name = "distance")
     private Double distance;
+
+    @Transient
+    private String departureTimeString;
+
+    @Transient
+    private String arrivalTimeString;
 }

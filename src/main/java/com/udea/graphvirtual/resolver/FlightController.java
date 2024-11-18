@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
@@ -45,17 +46,28 @@ public class FlightController {
 
 
     @MutationMapping
-    public Flight addFlight(@Argument UUID id, @Argument String flightNumber, @Argument int seatsAvailable, @Argument String origin, @Argument String destination,
-                            @Argument String departureTime, @Argument String arrivalTime, @Argument Double price, @Argument Double distance, @Argument String departureDate, @Argument String arrivalDate ) {
+    public Flight addFlight(@Argument UUID id,
+                            @Argument String flightNumber,
+                            @Argument int seatsAvailable,
+                            @Argument String origin,
+                            @Argument String destination,
+                            @Argument String departureTime,
+                            @Argument String arrivalTime,
+                            @Argument Double price,
+                            @Argument Double distance,
+                            @Argument String departureDate,
+                            @Argument String arrivalDate ) {
         try {
-            Calendar departure = Calendar.getInstance();
-            departure.setTime(new SimpleDateFormat("HH:mm:ss").parse(departureTime));
-            Calendar arrival = Calendar.getInstance();
-            arrival.setTime(new SimpleDateFormat("HH:mm:ss").parse(arrivalTime));
+            // Parsear las horas en formato "HH:mm"
+            LocalTime departure = LocalTime.parse(departureTime, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime arrival = LocalTime.parse(arrivalTime, DateTimeFormatter.ofPattern("HH:mm"));
 
-            return flightService.addFlight(flightNumber, seatsAvailable, origin, price, distance, destination, departure, arrival, new SimpleDateFormat("yyyy-MM-dd").parse(departureDate), new SimpleDateFormat("yyyy-MM-dd").parse(arrivalDate));
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format. Please use the format: yyyy-MM-dd'T'HH:mm:ss", e);
+            // Llamar al servicio con LocalTime en lugar de Calendar
+            return flightService.addFlight(flightNumber, seatsAvailable, origin, price, distance, destination, departure, arrival,
+                    new SimpleDateFormat("yyyy-MM-dd").parse(departureDate),
+                    new SimpleDateFormat("yyyy-MM-dd").parse(arrivalDate));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid date or time format. Please use the format: yyyy-MM-dd for dates and HH:mm for times.", e);
         }
     }
 
