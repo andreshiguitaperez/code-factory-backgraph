@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 17 (Zulu)
+      - name: Set up JDK 11 (Zulu)
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'  # Usar Zulu JDK
-          java-version: '17'  # Cambiar a Java 17
+          java-version: '11'
       - name: Build with Maven
         run: mvn clean install
 
@@ -26,12 +26,9 @@ jobs:
       - name: Install Docker
         run: |
           sudo apt-get update
-          sudo apt-get remove --purge -y containerd containerd.io
-          sudo apt-get install docker.io -y  # Instalar Docker
+          sudo apt-get install docker.io -y
       - name: Build Docker image
-        run: docker build -t backendflightsearch .  # Construir imagen Docker
-      - name: Login to Vercel
-        run: vercel login --token=${{ secrets.VERCEL_TOKEN_BACKEND }}  # Iniciar sesión en Vercel
+        run: docker build -t backendflightsearch .
       - name: Deploy to Vercel
         run: |
-          vercel --prod --token=${{ secrets.VERCEL_TOKEN_BACKEND }} --confirm  # Desplegar a Vercel
+          vercel --prod --token=${{ secrets.VERCEL_TOKEN_BACKEND }} --confirm
